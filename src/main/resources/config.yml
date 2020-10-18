@@ -1,0 +1,23 @@
+#コンフィグを開いたり、編集した場合は、Editをtrueにしてください。
+edit: false
+
+#データベース関係の設定です。
+database:
+  #Muteや,Banが保存されます。
+  abuse:
+    driver: "org.sqlite.JDBC"
+    jdbcUrl: "jdbc:sqlite:abuse.db"
+  #解除されたBanや、Kickが保存されます。
+  log:
+    driver: "org.sqlite.JDBC"
+    jdbcUrl: "jdbc:sqlite:log.db"
+
+#接続関係の設定です。
+con:
+  #接続に使用されるポートです。
+  port: 810
+
+#暗号化関係のやつです。
+security:
+  #長さです。
+  length: 512
