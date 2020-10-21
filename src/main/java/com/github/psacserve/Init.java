@@ -1,12 +1,14 @@
 package com.github.psacserve;
 
 import com.github.psacserve.server.Root;
+import com.github.psacserve.task.Worker;
 import com.sun.net.httpserver.HttpServer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.net.InetSocketAddress;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.Statement;
 
 import static com.github.psacserve.BanServer.bans;
@@ -14,9 +16,19 @@ import static com.github.psacserve.BanServer.config;
 import static com.github.psacserve.BanServer.log;
 import static com.github.psacserve.BanServer.logger;
 import static com.github.psacserve.BanServer.stop;
+import static com.github.psacserve.BanServer.worker;
 
 public class Init
 {
+
+    public static void startWorker()
+    {
+        logger.info("常駐ワーカーを起動中...");
+        worker = new Worker();
+        worker.start();
+        logger.info("常駐ワーカーが起動しました...");
+    }
+
     public static void startServer(int port)
     {
         logger.info("コアサーバをバインドしています...");
@@ -72,11 +84,11 @@ public class Init
 
     public static void connectDB()
     {
-
         bans = Init.getHikariConfig(config.getString("database.abuse.driver"), config.getString("database.abuse.jdbcUrl"));
         log = Init.getHikariConfig(config.getString("database.log.driver"), config.getString("database.log.jdbcUrl"));
-
     }
+
+
 
     public static void initDatabase()
     {
