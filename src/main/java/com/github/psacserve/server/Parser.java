@@ -2,24 +2,26 @@ package com.github.psacserve.server;
 
 import com.github.psacserve.BanServer;
 
-import javax.print.attribute.HashAttributeSet;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public class Parser
 {
-    public static Result parse(String path, String request)
+    public static Result parse(String method, String path, String request)
     {
+
+        BanServer.logger.info(method + ":   " + path + "  " + request);
+
         switch (path)
         {
-            case "/":
-                return new Result(JSON.response(false, "Invalid argument."), 400);
             case "/info":
+            case "/userinfo":
                 HashMap<String, String> req = parseRequest(request);
+
                 return new Result(JSON.response(true, "Test Content."), 200);
             default:
-                return new Result("No contents.", 204);
+                return new Result("<h1>403 Forbidden<h1>", 403);
         }
     }
 

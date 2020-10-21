@@ -32,7 +32,6 @@ public class Root implements HttpHandler
             BanServer.printStackTrace(e);
         }
 
-        BanServer.logger.info("アクセス: " +  s.getRequestMethod() + "  " + s.getRequestURI() + "  " + body);
 
         String req = body.toString();
 
@@ -44,7 +43,7 @@ public class Root implements HttpHandler
             req = uri[1];
         }
 
-        Result result = Parser.parse(s.getRequestMethod().equals("GET") && s.getRequestURI().toString().contains("?") ? uri[0]: s.getRequestURI().toASCIIString(), req);
+        Result result = Parser.parse(s.getRequestMethod(), s.getRequestMethod().equals("GET") && s.getRequestURI().toString().contains("?") ? uri[0]: s.getRequestURI().toString(), req);
 
         OutputStream rB = s.getResponseBody();
         s.sendResponseHeaders(result.code, result.body.equals("") ? 0: result.body.getBytes().length);

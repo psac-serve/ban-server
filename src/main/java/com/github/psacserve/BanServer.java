@@ -39,8 +39,7 @@ public class BanServer
         config.saveDefaultConfig();
         Init.editCheck();
 
-        logger.info("暗号化キーを探しています...");
-        Init.searchAndGenerateKey();
+
 
         logger.info("データベースに接続してます...");
         Init.connectDB();

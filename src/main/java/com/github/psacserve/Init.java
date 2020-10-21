@@ -8,7 +8,6 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import java.net.InetSocketAddress;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Statement;
 
 import static com.github.psacserve.BanServer.bans;
@@ -57,28 +56,6 @@ public class Init
             logger.severe("コンフィグファイルが一回も開かれていない、ないし編集がされていません！");
             logger.info("NOTE: 開いたことがあるまたは編集したことがある場合、'edit'キーをtrueにセットしてください！");
             stop(1);
-        }
-    }
-
-    public static void searchAndGenerateKey()
-    {
-        if ((int)config.get("security.length") < 512)
-        {
-            logger.warning("設定されている暗号化キーの長さが低すぎます！");
-            logger.warning("512(bits)以上に設定してください！");
-            stop(1);
-        }
-
-        if (!Security.exists())
-        {
-            logger.info("暗号化キーファイルが見つかりませんでした。");
-            logger.info("暗号化キーを生成しています...");
-            Security.genKey();
-        }
-        else
-        {
-            logger.info("暗号化キーファイルが見つかりました。");
-            logger.info("公開鍵: " + Security.getKey("security.pub.key"));
         }
     }
 
