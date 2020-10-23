@@ -56,7 +56,7 @@
         <dependency>
             <groupId>com.github.P2P-Develop</groupId>
             <artifactId>PeyangSuperLibrary</artifactId>
-            <version>11.45.14</version>
+            <version>11.451.4810</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -73,5 +73,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.11.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+
     </dependencies>
 </project>

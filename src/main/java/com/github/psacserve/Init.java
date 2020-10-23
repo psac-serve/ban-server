@@ -1,7 +1,6 @@
 package com.github.psacserve;
 
 import com.github.psacserve.server.Root;
-import com.github.psacserve.task.Worker;
 import com.sun.net.httpserver.HttpServer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -15,18 +14,31 @@ import static com.github.psacserve.BanServer.config;
 import static com.github.psacserve.BanServer.log;
 import static com.github.psacserve.BanServer.logger;
 import static com.github.psacserve.BanServer.stop;
-import static com.github.psacserve.BanServer.worker;
 
 public class Init
 {
 
-    public static void startWorker()
+    public static void token()
     {
-        logger.info("常駐ワーカーを起動中...");
-        worker = new Worker();
-        worker.start();
-        logger.info("常駐ワーカーが起動しました...");
+        if (!((boolean) config.get("security.token")))
+        {
+            logger.warning("");
+            logger.warning("警告：トークンを使用しない場合、第三者にアクセスされデータベースを書き換えられる恐れがあります。");
+            logger.warning("");
+            return;
+        }
+
+        logger.info("トークンを読み込んでいます...");
+        if (!Token.exists())
+        {
+            logger.info("トークンが見つかりませんでした。");
+            logger.info("トークンを生成します...");
+            Token.genToken();
+        }
+
+        BanServer.token = Token.getToken();
     }
+
 
     public static void startServer(int port)
     {
@@ -53,7 +65,7 @@ public class Init
     {
         if (!(boolean)config.get("edit"))
         {
-            logger.severe("コンフィグファイルが一回も開かれていない、ないし編集がされていません！");
+            logger.severe("設定ファイルが一回も開かれていないないし編集がされていません！");
             logger.info("NOTE: 開いたことがあるまたは編集したことがある場合、'edit'キーをtrueにセットしてください！");
             stop(1);
         }

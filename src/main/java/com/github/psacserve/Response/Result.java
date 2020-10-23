@@ -1,4 +1,4 @@
-package com.github.psacserve.server;
+package com.github.psacserve.Response;
 
 public class Result
 {
