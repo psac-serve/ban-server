@@ -3,6 +3,7 @@ package com.github.psacserve;
 import com.zaxxer.hikari.HikariDataSource;
 import develop.p2p.lib.FileConfiguration;
 
+import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Locale;
@@ -16,6 +17,10 @@ public class BanServer
     public static HikariDataSource log;
     public static HikariDataSource bans;
     public static String token;
+    public static final String dirPath = new File(BanServer.class.getProtectionDomain().getCodeSource().getLocation().toString().replaceFirst("file:([/\\\\])", "")).getParent() +
+            System.getProperty("file.separator") +
+            "PeyangBanServer" +
+            System.getProperty("file.separator");
 
     public static void main(String[] args)
     {
@@ -33,6 +38,7 @@ public class BanServer
         logger.info("サーバーを開始しています...");
         logger.info("設定ファイルを読み込んでいます...");
         config = new FileConfiguration("config.yml");
+        Init.injectConfig();
         config.saveDefaultConfig();
         Init.editCheck();
 
@@ -68,7 +74,7 @@ public class BanServer
 
         if (bans != null)
         {
-            logger.info("LOGデータベースを停止しています...");
+            logger.info("BANデータベースを停止しています...");
             bans.close();
             bans = null;
         }

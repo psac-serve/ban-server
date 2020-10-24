@@ -1,15 +1,15 @@
 package com.github.psacserve;
 
 import com.github.psacserve.server.Root;
-import com.sun.corba.se.impl.oa.toa.TOA;
 import com.sun.net.httpserver.HttpServer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,6 +21,27 @@ import static com.github.psacserve.BanServer.stop;
 
 public class Init
 {
+
+    public static void injectConfig()
+    {
+        try
+        {
+            Field cfg = config.getClass().getDeclaredField("cfg");
+            Field file = config.getClass().getDeclaredField("fileStr");
+
+            cfg.setAccessible(true);
+            file.setAccessible(true);
+
+            cfg.set(config, new File(BanServer.dirPath + "config.yml"));
+            file.set(config, BanServer.dirPath + "config.yml");
+
+        }
+        catch (Exception e)
+        {
+            BanServer.printStackTrace(e);
+            BanServer.stop(1);
+        }
+    }
 
     public static void antiLag()
     {
@@ -92,6 +113,7 @@ public class Init
         catch (Exception e)
         {
             BanServer.printStackTrace(e);
+            BanServer.stop(1);
             return;
         }
 

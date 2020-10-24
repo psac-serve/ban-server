@@ -6,11 +6,11 @@ database:
   #Muteや,Banが保存されます。
   abuse:
     driver: "org.sqlite.JDBC"
-    jdbcUrl: "jdbc:sqlite:abuse.db"
+    jdbcUrl: "jdbc:sqlite:PeyangBanServer/abuse.db"
   #解除されたBanや、Kickが保存されます。
   log:
     driver: "org.sqlite.JDBC"
-    jdbcUrl: "jdbc:sqlite:log.db"
+    jdbcUrl: "jdbc:sqlite:PeyangBanServer/log.db"
 
 #接続関係の設定です。
 con:

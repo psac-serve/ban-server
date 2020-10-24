@@ -5,15 +5,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
 import java.util.Date;
-import java.util.Random;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 public class Token
 {
-    private static final File token = new File("token.sig");
+    private static final File token = new File(BanServer.dirPath + "token.sig");
 
     public static boolean exists()
     {
