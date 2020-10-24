@@ -1,6 +1,7 @@
 package com.github.psacserve;
 
 import com.github.psacserve.server.Root;
+import com.sun.corba.se.impl.oa.toa.TOA;
 import com.sun.net.httpserver.HttpServer;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -8,6 +9,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.net.InetSocketAddress;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.github.psacserve.BanServer.bans;
 import static com.github.psacserve.BanServer.config;
@@ -18,9 +22,45 @@ import static com.github.psacserve.BanServer.stop;
 public class Init
 {
 
+    public static void antiLag()
+    {
+        if (!((boolean) config.get("con.antilag.enable")))
+        {
+            logger.warning("");
+            logger.warning("警告：遅延回避を使用しない場合、接続に著しく時間がかかるようになる可能性があります。");
+            logger.warning("");
+            return;
+        }
+
+        logger.info("遅延回避タイマーをセットしています...");
+        new Timer().scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Class.forName("com.github.psacserve.server.Parser");
+                    Class.forName("com.github.psacserve.server.QuickResult");
+                    Class.forName("com.github.psacserve.server.Root");
+                    Class.forName("com.github.psacserve.Response.BanEntry");
+                    Class.forName("com.github.psacserve.Moderate.Ban");
+                    Class.forName("com.github.psacserve.Response.Result");
+                }
+                catch(Exception e)
+                {
+                    BanServer.printStackTrace(e);
+                }
+            }
+        }, 1000L, Math.multiplyExact(
+                Math.multiplyExact(
+                        Long.parseLong(config.get("con.antilag.exe").toString()), 60L), 1000L)
+        );
+    }
+
     public static void token()
     {
-        if (!((boolean) config.get("security.token")))
+        if (!((boolean) config.get("con.token")))
         {
             logger.warning("");
             logger.warning("警告：トークンを使用しない場合、第三者にアクセスされデータベースを書き換えられる恐れがあります。");

@@ -16,3 +16,11 @@ database:
 con:
   #接続に使用されるポートです。
   port: 810
+  #トークン認証を使用するかどうかです。
+  token: true
+  #ラグ回避用です
+  antilag:
+    #有効かどうか
+    enable: true
+    #定期実行時間(分)
+    exe: 7

@@ -44,9 +44,10 @@ public class BanServer
         logger.info("データベースにテーブルを追加しています...");
         Init.initDatabase();
 
+        Init.antiLag();
+
         logger.info("サーバーをスタートします。");
         Init.startServer(config.get("con.port"));
-
 
         long end = System.currentTimeMillis() - start;
         double time = (double) end / 1000;
