@@ -25,6 +25,11 @@ public class BanServer
     public static void main(String[] args)
     {
         logger = Logger.getLogger("PeyangBanManager");
+
+        if (Double.parseDouble(System.getProperty("java.specification.version")) != 1.8)
+            logger.warning("PeyangBanServer は、JDK1.8.0(u221) で開発/確認しております。" +
+                    "\nJava8以外のバージョンを使用する場合、意図しない動作または動作しない といったバグが発生する可能性がございます。");
+
         Logger.getLogger("com.zaxxer.hikari.HikariDataSource").setLevel(Level.OFF);
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS [%4$s] %5$s%6$s%n");

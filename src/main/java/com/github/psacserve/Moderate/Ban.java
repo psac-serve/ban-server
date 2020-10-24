@@ -2,12 +2,14 @@ package com.github.psacserve.Moderate;
 
 import com.github.psacserve.BanServer;
 import com.github.psacserve.Response.BanEntry;
+import develop.p2p.lib.SQLModifier;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Ban
@@ -34,32 +36,27 @@ public class Ban
     }
     public static void pardon(String player)
     {
-
-        try (Connection banC = BanServer.bans.getConnection();
-             Connection logC = BanServer.log.getConnection();
-             PreparedStatement del =
-                     banC.prepareStatement("DELETE FROM ban WHERE UUID=?");
-             PreparedStatement found = banC.prepareStatement("SELECT BANID, DATE, REASON, EXPIRE, STAFF FROM ban WHERE UUID=?");)
+        try(Connection ban = BanServer.bans.getConnection();
+            PreparedStatement banLp = ban.prepareStatement("SELECT UUID, BANID, DATE, REASON, STAFF FROM ban WHERE UUID=?");
+            Connection log = BanServer.log.getConnection())
         {
-            del.setString(1, player.replace("-", ""));
-            found.setString(1, player.replace("-", ""));
-            ResultSet set = found.executeQuery();
-            while (set.next())
-            {
-                try(PreparedStatement in = logC.prepareStatement("INSERT INTO ban VALUES (?, ?, ?, ?, ?, ?)"))
-                {
-                    in.setString(1, set.getString("UUID"));
-                    in.setString(2, set.getString("BANID"));
-                    in.setString(3, set.getString("DATE"));
-                    in.setString(4, set.getString("REASON"));
-                    in.setString(5, String.valueOf(new Date().getTime()));
-                    in.setInt(6, Integer.parseInt(set.getString("STAFF")));
-                }
-            }
+            banLp.setString(1, player);
+            ResultSet set = banLp.executeQuery();
+            if (!set.next())
+                return;
+            SQLModifier.insert(log, "ban",
+                    set.getString("UUID"),
+                    set.getString("BANID"),
+                    set.getString("DATE"),
+                    set.getString("REASON"),
+                    new Date().getTime(),
+                    set.getString("STAFF")
+            );
+            SQLModifier.delete(ban, "ban", new HashMap<String, String>(){{put("UUID", player);}});
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            BanServer.printStackTrace(e);
         }
 
     }

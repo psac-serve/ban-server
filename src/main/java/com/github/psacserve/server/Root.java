@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Root implements HttpHandler
@@ -17,6 +18,8 @@ public class Root implements HttpHandler
     public void handle(HttpExchange s) throws IOException
     {
         StringBuilder body = new StringBuilder();
+
+        s.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
 
         if (!s.getRequestHeaders().containsKey("Token"))
         {
@@ -59,9 +62,9 @@ public class Root implements HttpHandler
         Result result = Parser.parse(s.getRequestMethod(), s.getRequestMethod().equals("GET") && s.getRequestURI().toString().contains("?") ? uri[0]: s.getRequestURI().toString(), req);
 
         OutputStream rB = s.getResponseBody();
-        s.sendResponseHeaders(result.code, result.body.equals("") ? 0: result.body.getBytes().length);
+        s.sendResponseHeaders(result.code, result.body.equals("") ? 0: result.body.getBytes(StandardCharsets.UTF_8).length);
         if (result.body.length() != 0)
-            rB.write(result.body.getBytes());
+            rB.write(result.body.getBytes(StandardCharsets.UTF_8));
         rB.close();
     }
 }

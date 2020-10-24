@@ -4,12 +4,10 @@ import com.github.psacserve.BanServer;
 import com.github.psacserve.Moderate.Ban;
 import com.github.psacserve.Response.BanEntry;
 import com.github.psacserve.Response.Result;
-import develop.p2p.lib.SQLModifier;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -27,6 +25,31 @@ public class Parser
 
         switch (path)
         {
+            case "/ban":
+                if (!method.equals("PUT"))
+                    return new Result(QuickResult.error(method + " is not allowed."), 405);
+                if (QuickResult.isMissingFields(req, "reason", "expire", "uuid"))
+                    return QuickResult.missing(req, "reason", "expire", "uuid");
+                final String reason;
+                try
+                {
+                    reason = URLDecoder.decode(req.get("reason"), "UTF-8");
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    return new Result("Failed to reason parsing.", 405);
+                }
+
+                if (!req.get("expire").matches("^[0-9]+$") && !req.get("expire").equals("_PERM"))
+                    return new Result(req.get("expire") + " is not a DateTime.", 405);
+
+                new Thread(() -> {
+                    Ban.ban(req.get("uuid").replace("-", ""),
+                            reason,
+                            req.get("expire").equals("_PERM") ? null: new Date(Long.parseLong(req.get("expire"))));
+                }).start();
+
+                return new Result(QuickResult.successWithObject("state", "Processed."), 202);
             case "/unban":
             case "/pardon":
                 if (!method.equals("DELETE"))
@@ -35,33 +58,10 @@ public class Parser
                     return new Result(QuickResult.error("Missing one field [uuid]"), 400);
 
                 new Thread(() -> {
-                    try(Connection ban = BanServer.bans.getConnection();
-                        PreparedStatement banLp = ban.prepareStatement("SELECT UUID, BANID, DATE, REASON, STAFF FROM ban WHERE UUID=?");
-                        Connection log = BanServer.log.getConnection())
-                    {
-                        banLp.setString(1, req.get("uuid"));
-                        ResultSet set = banLp.executeQuery();
-                        if (!set.next())
-                            return;
-                        SQLModifier.insert(log, "ban",
-                                set.getString("UUID"),
-                                set.getString("BANID"),
-                                set.getString("DATE"),
-                                set.getString("REASON"),
-                                new Date().getTime(),
-                                set.getString("STAFF")
-                        );
-                        SQLModifier.delete(ban, "ban", new HashMap<String, String>(){{put("UUID",req.get("uuid"));}});
-                    }
-                    catch (Exception e)
-                    {
-                        BanServer.printStackTrace(e);
-                    }
+                    Ban.pardon(req.get("uuid").replace("-", ""));
                 }).start();
 
-                return new Result(QuickResult.successWithObject("state", "processing"), 202);
-
-
+                return new Result(QuickResult.successWithObject("state", "Processed."), 202);
             case "/bans":
                 if (!method.equals("GET"))
                     return new Result(QuickResult.error(method + " is not allowed."), 405);
@@ -69,8 +69,7 @@ public class Parser
                 if (QuickResult.isMissingFields(req, "uuid"))
                     return new Result(QuickResult.error("Missing one field [uuid]"), 400);
 
-                return new Result(QuickResult.successWithObject("bans", Ban.getBans(req.get("uuid"))),
-                        200);
+                return new Result(QuickResult.successWithObject("bans", Ban.getBans(req.get("uuid"))), 200);
             case "/getban":
                 if (!method.equals("GET"))
                     return new Result(QuickResult.error(method + " is not allowed."), 405);
