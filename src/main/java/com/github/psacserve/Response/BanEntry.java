@@ -5,7 +5,7 @@ public class BanEntry
     public String reason;
     public String id;
     public String expire;
-    public String unbannedDate = null;
+    public long unbannedDate;
 
     public boolean hasStaff;
 

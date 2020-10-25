@@ -46,7 +46,9 @@ public class Parser
                 new Thread(() -> {
                     Ban.ban(req.get("uuid").replace("-", ""),
                             reason,
-                            req.get("expire").equals("_PERM") ? null: new Date(Long.parseLong(req.get("expire"))));
+                            req.get("expire").equals("_PERM") ? null: new Date(Long.parseLong(req.get("expire"))),
+                            req.containsKey("staff") && Boolean.parseBoolean(req.get("staff"))
+                    );
                 }).start();
 
                 return new Result(QuickResult.successWithObject("state", "Processed."), 202);

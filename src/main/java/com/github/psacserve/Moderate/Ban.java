@@ -14,7 +14,7 @@ import java.util.LinkedList;
 
 public class Ban
 {
-    public static void ban(String uuid, String reason, Date date)
+    public static void ban(String uuid, String reason, Date date, boolean staff)
     {
         try (Connection connection = BanServer.bans.getConnection();
              PreparedStatement statement =
@@ -25,7 +25,7 @@ public class Ban
             statement.setString(3, String.valueOf(new Date().getTime()));
             statement.setString(4, reason);
             statement.setString(5, date == null ? "_PERM": String.valueOf(date.getTime()));
-            statement.setInt(6, 0);
+            statement.setInt(6, staff ? 0: 1);
             statement.execute();
         }
         catch (Exception e)
@@ -103,7 +103,10 @@ public class Ban
                 final BanEntry ban = new BanEntry();
                 ban.id = set.getString("BANID");
                 ban.reason = set.getString("REASON");
-                ban.unbannedDate = set.getString("UNBANDATE");
+
+                final String unban = set.getString("UNBANDATE");
+
+                ban.unbannedDate = unban == null || unban.equals("") ? null: Long.parseLong(unban);
                 ban.hasStaff = set.getInt("STAFF") == 1;
                 bans.add(ban);
             }
