@@ -86,9 +86,9 @@ public class Parser
 
                 return new Result(QuickResult.successWithObject("ban", entry), 200);
             case "/teapot":
-                return new Result("I'm a teapot.", 418);
+                return new Result(QuickResult.error("I'm a teapot."), 418);
             default:
-                return new Result("<h1>403 Forbidden<h1>", 403);
+                return new Result(QuickResult.error("Method not found."), 403);
         }
     }
 
