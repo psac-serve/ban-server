@@ -15,7 +15,7 @@ $ java -jar <JARファイル名>
 `$ java -jar <ファイル>` で起動してください。
 + `/path/to/PeyangBanServer/config.yml`を編集してください。
 #### 編集推奨項目
-+ *database*
++ *database*  
  デフォルトでは、SQLiteが使用可能になっています。  
  ですが、MySQLを使用したい場合等もあることでしょう。その場合は、  
  適当にggって設定してください。
