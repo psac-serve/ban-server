@@ -8,8 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -85,6 +89,48 @@ public class Parser
                     return new Result(QuickResult.error("This player is not banned."), 404);
 
                 return new Result(QuickResult.successWithObject("ban", entry), 200);
+            case "/weekly":
+                if (!method.equals("GET"))
+                    return new Result(QuickResult.error(method + " is not allowed."), 405);
+                final Calendar calender = Calendar.getInstance();
+                calender.setTime(new Date());
+                calender.add(Calendar.DAY_OF_MONTH, -7);
+
+                final long btw = Date.from(calender.toInstant()).getTime();
+                long staff = 0;
+                long other = 0;
+                try (final Connection connection = BanServer.bans.getConnection();
+                     final Connection l = BanServer.log.getConnection();
+                     final PreparedStatement sr = connection.prepareStatement("SELECT STAFF FROM ban WHERE DATE BETWEEN ? AND ?");
+                     final PreparedStatement spb = l.prepareStatement("SELECT STAFF FROM main.ban WHERE DATE BETWEEN ? AND ?"))
+                {
+                    sr.setLong(1, btw);
+                    sr.setLong(2, new Date().getTime());
+                    spb.setLong(1, btw);
+                    spb.setLong(2, new Date().getTime());
+
+                    ResultSet sC = sr.executeQuery();
+                    while (sC.next())
+                        if (sC.getInt("STAFF") == 0)
+                            staff++;
+                        else
+                            other++;
+                    ResultSet oC = spb.executeQuery();
+                    while (oC.next())
+                        if (oC.getInt("STAFF") == 0)
+                            staff++;
+                        else
+                            other++;
+                }
+                catch (Exception e)
+                {
+                    return new Result(QuickResult.error("An exception has occurred."), 503);
+                }
+
+                long finalStaff = staff;
+                long finalOther = other;
+                return new Result(QuickResult.successWithObject("data", new HashMap<String, Long>(){{put("staff", finalStaff); put("other", finalOther);}}), 200);
+
             case "/teapot":
                 return new Result(QuickResult.error("I'm a teapot."), 418);
             default:

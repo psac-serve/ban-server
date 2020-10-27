@@ -66,7 +66,7 @@ public class Ban
         BanEntry ban = null;
 
         try (Connection connection = BanServer.bans.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, EXPIRE, STAFF FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -76,6 +76,7 @@ public class Ban
                 ban.id = set.getString("BANID");
                 ban.reason = set.getString("REASON");
                 ban.expire = set.getString("EXPIRE");
+                ban.bannedDate = set.getLong("DATE");
                 ban.hasStaff = set.getInt("STAFF") == 1;
             }
 
@@ -94,7 +95,7 @@ public class Ban
         LinkedList<BanEntry> bans = new LinkedList<>();
 
         try (Connection connection = BanServer.log.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, STAFF, UNBANDATE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, STAFF, UNBANDATE, DATE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -103,7 +104,7 @@ public class Ban
                 final BanEntry ban = new BanEntry();
                 ban.id = set.getString("BANID");
                 ban.reason = set.getString("REASON");
-
+                ban.bannedDate = set.getLong("DATE");
                 final String unban = set.getString("UNBANDATE");
 
                 ban.unbannedDate = unban == null || unban.equals("") ? null: Long.parseLong(unban);
