@@ -4,12 +4,14 @@ import com.zaxxer.hikari.HikariDataSource;
 import develop.p2p.lib.FileConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class BanServer
@@ -30,11 +32,10 @@ public class BanServer
 
         if (Double.parseDouble(System.getProperty("java.specification.version")) != 1.8)
             logger.warning("PeyangBanServer は、JDK1.8.0(u221) で開発/確認しております。" +
-                    "\nJava8以外のバージョンを使用する場合、意図しない動作または動作しない といったバグが発生する可能性がございます。");
+                    "\nJava8以外のバージョンを使用する場合、意図しない動作または動作しない等のバグが発生する可能性がございます。");
 
         Logger.getLogger("com.zaxxer.hikari.HikariDataSource").setLevel(Level.OFF);
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-                "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS [%4$s] %5$s%6$s%n");
+        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tH:%1$tM:%1$tS %4$s] %5$s%6$s%n");
         Locale.setDefault(Locale.US);
         start();
     }
@@ -68,7 +69,12 @@ public class BanServer
         logger.info(time + "秒で起動が完了しました！");
     }
 
-    public static void stop(int code)
+    public static void stop (int code)
+    {
+        stop(code, true);
+    }
+
+    public static void stop(int code, boolean real)
     {
         logger.info("サーバーを停止しています...");
 
@@ -87,9 +93,10 @@ public class BanServer
         }
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        System.out.println(format.format(new Date()) + " [FATAL] BanServer has stopped with " + code);
+        System.out.println(format.format(new Date()) + " [FATAL] BanSererが終了しました。");
 
-        System.exit(code);
+        if (real)
+            System.exit(code);
     }
 
     public static void printStackTrace(Exception e)

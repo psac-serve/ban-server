@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 
 import static com.github.psacserve.BanServer.bans;
 import static com.github.psacserve.BanServer.config;
