@@ -6,6 +6,8 @@ import develop.p2p.lib.FileConfiguration;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,6 +85,9 @@ public class BanServer
             bans.close();
             bans = null;
         }
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        System.out.println(format.format(new Date()) + " [FATAL] BanServer has stopped with " + code);
 
         System.exit(code);
     }
