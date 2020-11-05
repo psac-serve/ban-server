@@ -72,11 +72,14 @@ public class Ban
             ResultSet set = statement.executeQuery();
             if (set.next())
             {
+                final String expire = set.getString("EXPIRE");
+
                 ban = new BanEntry();
                 ban.id = set.getString("BANID");
                 ban.reason = set.getString("REASON");
-                ban.expire = set.getString("EXPIRE");
+                ban.expire = expire.equals("_PERM") ? null: Long.parseLong(expire);
                 ban.bannedDate = set.getLong("DATE");
+                ban.unbannedDate = null;
                 ban.hasStaff = set.getInt("STAFF") == 1;
             }
 

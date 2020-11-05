@@ -4,9 +4,9 @@ public class BanEntry
 {
     public String reason;
     public String id;
-    public String expire;
-    public long unbannedDate;
-    public long bannedDate;
+    public Long expire;
+    public Long unbannedDate;
+    public Long bannedDate;
     public boolean hasStaff;
 
 
