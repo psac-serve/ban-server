@@ -59,7 +59,12 @@ public class Root implements HttpHandler
             req = uri[1];
         }
 
-        Result result = Parser.parse(s.getRequestMethod(), s.getRequestMethod().equals("GET") && s.getRequestURI().toString().contains("?") ? uri[0]: s.getRequestURI().toString(), req);
+        final String method = s.getRequestMethod();
+        final String path = s.getRequestMethod().equals("GET") && s.getRequestURI().toString().contains("?") ? uri[0]: s.getRequestURI().toString();
+        BanServer.logger.info(method + ":   FROM: " + s.getRemoteAddress().getAddress().toString() + "    " + path + "  " + req);
+
+
+        Result result = Parser.parse(method, path, req);
 
         OutputStream rB = s.getResponseBody();
         s.sendResponseHeaders(result.code, result.body.equals("") ? 0: result.body.getBytes(StandardCharsets.UTF_8).length);

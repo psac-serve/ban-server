@@ -22,7 +22,6 @@ public class Parser
     public static Result parse(final String method, final String path, final String request)
     {
 
-        BanServer.logger.info(method + ":   " + path + "  " + request);
 
         HashMap<String, String> req = parseRequest(request);
 
