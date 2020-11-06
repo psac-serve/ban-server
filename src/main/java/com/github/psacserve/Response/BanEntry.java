@@ -8,6 +8,6 @@ public class BanEntry
     public Long unbannedDate;
     public Long bannedDate;
     public boolean hasStaff;
-
+    public boolean unBanned;
 
 }

@@ -80,6 +80,7 @@ public class Ban
                 ban.expire = expire.equals("_PERM") ? null: Long.parseLong(expire);
                 ban.bannedDate = set.getLong("DATE");
                 ban.unbannedDate = null;
+                ban.unBanned = false;
                 ban.hasStaff = set.getInt("STAFF") == 1;
             }
 
@@ -112,6 +113,7 @@ public class Ban
 
                 ban.unbannedDate = unban == null || unban.equals("") ? null: Long.parseLong(unban);
                 ban.hasStaff = set.getInt("STAFF") == 1;
+                ban.unBanned = true;
                 bans.add(ban);
             }
 
