@@ -11,7 +11,6 @@ import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -147,7 +146,10 @@ public class Parser
                 .forEach(s -> {
                     String[] key = StringUtils.split(s, "=");
                     if (key.length != 2)
-                        BanServer.printStackTrace(new ParseException("Failed to parsing the parameter(s).", -1));
+                    {
+                        resp.put(key[0], "");
+                        return;
+                    }
                     resp.put(key[0], key[1]);
                 });
         return resp;

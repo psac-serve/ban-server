@@ -4,14 +4,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import develop.p2p.lib.FileConfiguration;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class BanServer
