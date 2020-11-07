@@ -154,7 +154,9 @@ public class Init
                     "DATE text," +
                     "REASON text," +
                     "EXPIRE text," +
-                    "STAFF integer)");
+                    "STAFF integer," +
+                    "BANNEDBY text" +
+                    ")");
             logS.execute("CREATE TABLE IF NOT EXISTS ban(" +
                     "UUID text," +
                     "BANID text," +
@@ -162,7 +164,10 @@ public class Init
                     "REASON text," +
                     "EXPIRE text," +
                     "UNBANDATE text," +
-                    "STAFF integer)");
+                    "STAFF integer," +
+                    "BANNEDBY text," +
+                    "UNBANNEDBY text" +
+                    ")");
 
         }
         catch(Exception e)

@@ -30,8 +30,8 @@ public class Parser
             case "/ban":
                 if (!method.equals("PUT"))
                     return new Result(QuickResult.error(method + " is not allowed."), 405);
-                if (QuickResult.isMissingFields(req, "reason", "expire", "uuid"))
-                    return QuickResult.missing(req, "reason", "expire", "uuid");
+                if (QuickResult.isMissingFields(req, "reason", "expire", "uuid", "by"))
+                    return QuickResult.missing(req, "reason", "expire", "uuid", "by");
                 final String reason;
                 try
                 {
@@ -47,6 +47,7 @@ public class Parser
 
                 new Thread(() -> {
                     Ban.ban(req.get("uuid").replace("-", ""),
+                            req.get("by").replace("-", ""),
                             reason,
                             req.get("expire").equals("_PERM") ? null: new Date(Long.parseLong(req.get("expire"))),
                             req.containsKey("staff") && Boolean.parseBoolean(req.get("staff"))
@@ -58,11 +59,10 @@ public class Parser
             case "/pardon":
                 if (!method.equals("DELETE"))
                     return new Result(QuickResult.error(method + " is not allowed."), 405);
-                if (QuickResult.isMissingFields(req, "uuid"))
-                    return new Result(QuickResult.error("Missing one field [uuid]"), 400);
-
+                if (QuickResult.isMissingFields(req, "uuid", "by"))
+                    return QuickResult.missing(req, "uuid", "by");
                 new Thread(() -> {
-                    Ban.pardon(req.get("uuid").replace("-", ""));
+                    Ban.pardon(req.get("uuid").replace("-", ""), req.get("by").replace("-", ""));
                 }).start();
 
                 return new Result(QuickResult.successWithObject("state", "Processed."), 202);

@@ -14,11 +14,11 @@ import java.util.LinkedList;
 
 public class Ban
 {
-    public static void ban(String uuid, String reason, Date date, boolean staff)
+    public static void ban(String uuid, String bannedBy, String reason, Date date, boolean staff)
     {
         try (Connection connection = BanServer.bans.getConnection();
              PreparedStatement statement =
-                     connection.prepareStatement("INSERT INTO ban VALUES (?, ?, ?, ?, ?, ?)"))
+                     connection.prepareStatement("INSERT INTO ban VALUES (?, ?, ?, ?, ?, ?, ?)"))
         {
             statement.setString(1, uuid.replace("-", ""));
             statement.setString(2, RandomStringUtils.randomAlphanumeric(8));
@@ -26,6 +26,7 @@ public class Ban
             statement.setString(4, reason);
             statement.setString(5, date == null ? "_PERM": String.valueOf(date.getTime()));
             statement.setInt(6, staff ? 0: 1);
+            statement.setString(7, bannedBy);
             statement.execute();
         }
         catch (Exception e)
@@ -34,10 +35,10 @@ public class Ban
         }
 
     }
-    public static void pardon(String player)
+    public static void pardon(String player, String pardonnedBy)
     {
         try(Connection ban = BanServer.bans.getConnection();
-            PreparedStatement banLp = ban.prepareStatement("SELECT UUID, BANID, DATE, REASON, STAFF, EXPIRE FROM ban WHERE UUID=?");
+            PreparedStatement banLp = ban.prepareStatement("SELECT BANNEDBY, UUID, BANID, DATE, REASON, STAFF, EXPIRE FROM ban WHERE UUID=?");
             Connection log = BanServer.log.getConnection())
         {
             banLp.setString(1, player);
@@ -51,7 +52,9 @@ public class Ban
                     set.getString("REASON"),
                     set.getString("EXPIRE"),
                     new Date().getTime(),
-                    set.getString("STAFF")
+                    set.getString("STAFF"),
+                    set.getString("BANNEDBY"),
+                    pardonnedBy
             );
             SQLModifier.delete(ban, "ban", new HashMap<String, String>(){{put("UUID", player);}});
         }
@@ -67,7 +70,7 @@ public class Ban
         BanEntry ban = null;
 
         try (Connection connection = BanServer.bans.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -83,6 +86,7 @@ public class Ban
                 ban.unbannedDate = null;
                 ban.unBanned = false;
                 ban.hasStaff = set.getInt("STAFF") == 1;
+                ban.bannedBy = set.getString("BANNEDBY");
             }
 
         }
@@ -100,7 +104,7 @@ public class Ban
         LinkedList<BanEntry> bans = new LinkedList<>();
 
         try (Connection connection = BanServer.log.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -116,6 +120,8 @@ public class Ban
                 ban.hasStaff = set.getInt("STAFF") == 1;
                 ban.unBanned = true;
                 ban.expire = set.getString("EXPIRE").equals("_PERM") ? null: set.getLong("EXPIRE");
+                ban.bannedBy = set.getString("BANNEDBY");
+                ban.unBannedBy = set.getString("UNBANNEDBY");
                 bans.add(ban);
             }
 

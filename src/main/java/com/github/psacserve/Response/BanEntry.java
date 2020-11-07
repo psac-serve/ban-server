@@ -10,4 +10,6 @@ public class BanEntry
     public boolean hasStaff;
     public boolean unBanned;
 
+    public String bannedBy;
+    public String unBannedBy;
 }
