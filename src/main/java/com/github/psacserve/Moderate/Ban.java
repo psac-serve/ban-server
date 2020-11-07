@@ -35,7 +35,7 @@ public class Ban
         }
 
     }
-    public static void pardon(String player, String pardonnedBy)
+    public static void pardon(String player, String pardonnedBy, String pardonReason)
     {
         try(Connection ban = BanServer.bans.getConnection();
             PreparedStatement banLp = ban.prepareStatement("SELECT BANNEDBY, UUID, BANID, DATE, REASON, STAFF, EXPIRE FROM ban WHERE UUID=?");
@@ -54,7 +54,8 @@ public class Ban
                     new Date().getTime(),
                     set.getString("STAFF"),
                     set.getString("BANNEDBY"),
-                    pardonnedBy
+                    pardonnedBy,
+                    pardonReason
             );
             SQLModifier.delete(ban, "ban", new HashMap<String, String>(){{put("UUID", player);}});
         }
@@ -104,7 +105,7 @@ public class Ban
         LinkedList<BanEntry> bans = new LinkedList<>();
 
         try (Connection connection = BanServer.log.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -122,6 +123,7 @@ public class Ban
                 ban.expire = set.getString("EXPIRE").equals("_PERM") ? null: set.getLong("EXPIRE");
                 ban.bannedBy = set.getString("BANNEDBY");
                 ban.unBannedBy = set.getString("UNBANNEDBY");
+                ban.unBanReason = set.getString("UNBANREASON");
                 bans.add(ban);
             }
 

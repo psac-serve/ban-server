@@ -12,4 +12,5 @@ public class BanEntry
 
     public String bannedBy;
     public String unBannedBy;
+    public String unBanReason;
 }

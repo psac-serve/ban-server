@@ -166,7 +166,8 @@ public class Init
                     "UNBANDATE text," +
                     "STAFF integer," +
                     "BANNEDBY text," +
-                    "UNBANNEDBY text" +
+                    "UNBANNEDBY text," +
+                    "UNBANREASON text" +
                     ")");
 
         }

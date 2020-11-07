@@ -59,10 +59,21 @@ public class Parser
             case "/pardon":
                 if (!method.equals("DELETE"))
                     return new Result(QuickResult.error(method + " is not allowed."), 405);
-                if (QuickResult.isMissingFields(req, "uuid", "by"))
-                    return QuickResult.missing(req, "uuid", "by");
+                if (QuickResult.isMissingFields(req, "uuid", "by", "reason"))
+                    return QuickResult.missing(req, "uuid", "by", "reason");
+
+                final String pardonReason;
+                try
+                {
+                    pardonReason = URLDecoder.decode(req.get("reason"), "UTF-8");
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    return new Result("Failed to reason parsing.", 405);
+                }
+
                 new Thread(() -> {
-                    Ban.pardon(req.get("uuid").replace("-", ""), req.get("by").replace("-", ""));
+                    Ban.pardon(req.get("uuid").replace("-", ""), req.get("by").replace("-", ""), pardonReason);
                 }).start();
 
                 return new Result(QuickResult.successWithObject("state", "Processed."), 202);
