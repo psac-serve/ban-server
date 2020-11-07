@@ -100,7 +100,7 @@ public class Ban
         LinkedList<BanEntry> bans = new LinkedList<>();
 
         try (Connection connection = BanServer.log.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, STAFF, UNBANDATE, DATE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -115,6 +115,7 @@ public class Ban
                 ban.unbannedDate = unban == null || unban.equals("") ? null: Long.parseLong(unban);
                 ban.hasStaff = set.getInt("STAFF") == 1;
                 ban.unBanned = true;
+                ban.expire = set.getLong("EXPIRE");
                 bans.add(ban);
             }
 
