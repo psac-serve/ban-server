@@ -37,7 +37,7 @@ public class Ban
     public static void pardon(String player)
     {
         try(Connection ban = BanServer.bans.getConnection();
-            PreparedStatement banLp = ban.prepareStatement("SELECT UUID, BANID, DATE, REASON, STAFF FROM ban WHERE UUID=?");
+            PreparedStatement banLp = ban.prepareStatement("SELECT UUID, BANID, DATE, REASON, STAFF, EXPIRE FROM ban WHERE UUID=?");
             Connection log = BanServer.log.getConnection())
         {
             banLp.setString(1, player);
@@ -49,6 +49,7 @@ public class Ban
                     set.getString("BANID"),
                     set.getString("DATE"),
                     set.getString("REASON"),
+                    set.getString("EXPIRE"),
                     new Date().getTime(),
                     set.getString("STAFF")
             );

@@ -160,14 +160,8 @@ public class Init
                     "BANID text," +
                     "DATE text," +
                     "REASON text," +
+                    "EXPIRE text," +
                     "UNBANDATE text," +
-                    "STAFF integer)");
-            logS.execute("CREATE TABLE IF NOT EXISTS kick(" +
-                    "PLAYER text," +
-                    "UUID text," +
-                    "KICKID text," +
-                    "DATE text," +
-                    "REASON text," +
                     "STAFF integer)");
 
         }
