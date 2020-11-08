@@ -17,7 +17,7 @@ public class QuickResult
         {
             return "{\"success\":false,\"cause\":\"" + cause.replace("\"", "\\\"") + "\"}";
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             BanServer.printStackTrace(e);
             return "";
@@ -45,7 +45,11 @@ public class QuickResult
     {
         try
         {
-            return new ObjectMapper().writeValueAsString(new HashMap<String, Object>(){{put("success", true); put(entName, obj);}});
+            return new ObjectMapper().writeValueAsString(new HashMap<String, Object>()
+            {{
+                put("success", true);
+                put(entName, obj);
+            }});
         }
         catch (JsonProcessingException e)
         {

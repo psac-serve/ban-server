@@ -46,7 +46,8 @@ public class Parser
                     return new Result(req.get("expire") + " is not a DateTime.", 405);
 
                 new Thread(() -> {
-                    Ban.ban(req.get("uuid").replace("-", ""),
+                    Ban.ban(
+                            req.get("uuid").replace("-", ""),
                             req.get("by").replace("-", ""),
                             reason,
                             req.get("expire").equals("_PERM") ? null: new Date(Long.parseLong(req.get("expire"))),
@@ -138,7 +139,11 @@ public class Parser
 
                 long finalStaff = staff;
                 long finalOther = other;
-                return new Result(QuickResult.successWithObject("data", new HashMap<String, Long>(){{put("staff", finalStaff); put("other", finalOther);}}), 200);
+                return new Result(QuickResult.successWithObject("data", new HashMap<String, Long>()
+                {{
+                    put("staff", finalStaff);
+                    put("other", finalOther);
+                }}), 200);
 
             case "/teapot":
                 return new Result(QuickResult.error("I'm a teapot."), 418);

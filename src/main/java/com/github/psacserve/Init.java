@@ -13,7 +13,11 @@ import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.github.psacserve.BanServer.*;
+import static com.github.psacserve.BanServer.bans;
+import static com.github.psacserve.BanServer.config;
+import static com.github.psacserve.BanServer.log;
+import static com.github.psacserve.BanServer.logger;
+import static com.github.psacserve.BanServer.stop;
 
 public class Init
 {
@@ -60,16 +64,16 @@ public class Init
                                                     Class.forName("com.github.psacserve.server.Parser");
                                                     Class.forName("com.github.psacserve.server.QuickResult");
                                                     Class.forName("com.github.psacserve.server.Root");
-                    Class.forName("com.github.psacserve.Response.BanEntry");
-                    Class.forName("com.github.psacserve.Moderate.Ban");
-                    Class.forName("com.github.psacserve.Response.Result");
-                }
-                catch(Exception e)
-                {
-                    BanServer.printStackTrace(e);
-                }
-            }
-        }, 1000L, Math.multiplyExact(
+                                                    Class.forName("com.github.psacserve.Response.BanEntry");
+                                                    Class.forName("com.github.psacserve.Moderate.Ban");
+                                                    Class.forName("com.github.psacserve.Response.Result");
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    BanServer.printStackTrace(e);
+                                                }
+                                            }
+                                        }, 1000L, Math.multiplyExact(
                 Math.multiplyExact(
                         Long.parseLong(config.get("con.antilag.exe").toString()), 60L), 1000L)
         );
@@ -96,7 +100,6 @@ public class Init
         BanServer.token = Token.getToken();
     }
 
-
     public static void startServer(int port)
     {
         logger.info("Binding root server...");
@@ -121,7 +124,7 @@ public class Init
 
     public static void editCheck()
     {
-        if (!(boolean)config.get("edit"))
+        if (!(boolean) config.get("edit"))
         {
             logger.severe("The configuration file doesn't changed!");
             logger.info("NOTE: If the configuration file was changed, set the key 'edit' to the value 'true'.");
@@ -135,14 +138,12 @@ public class Init
         log = Init.getHikariConfig(config.getString("database.log.driver"), config.getString("database.log.jdbcUrl"));
     }
 
-
-
     public static void initDatabase()
     {
-        try(Connection banC = BanServer.bans.getConnection();
-            Statement banS = banC.createStatement();
-            Connection logC = BanServer.log.getConnection();
-            Statement logS = logC.createStatement())
+        try (Connection banC = BanServer.bans.getConnection();
+             Statement banS = banC.createStatement();
+             Connection logC = BanServer.log.getConnection();
+             Statement logS = logC.createStatement())
         {
             banS.execute("CREATE TABLE IF NOT EXISTS ban(" +
                     "UUID text," +
@@ -167,7 +168,7 @@ public class Init
                     ")");
 
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             BanServer.printStackTrace(e);
         }

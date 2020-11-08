@@ -35,11 +35,12 @@ public class Ban
         }
 
     }
+
     public static void pardon(String player, String pardonnedBy, String pardonReason)
     {
-        try(Connection ban = BanServer.bans.getConnection();
-            PreparedStatement banLp = ban.prepareStatement("SELECT BANNEDBY, UUID, BANID, DATE, REASON, STAFF, EXPIRE FROM ban WHERE UUID=?");
-            Connection log = BanServer.log.getConnection())
+        try (Connection ban = BanServer.bans.getConnection();
+             PreparedStatement banLp = ban.prepareStatement("SELECT BANNEDBY, UUID, BANID, DATE, REASON, STAFF, EXPIRE FROM ban WHERE UUID=?");
+             Connection log = BanServer.log.getConnection())
         {
             banLp.setString(1, player);
             ResultSet set = banLp.executeQuery();
@@ -57,7 +58,10 @@ public class Ban
                     pardonnedBy,
                     pardonReason
             );
-            SQLModifier.delete(ban, "ban", new HashMap<String, String>(){{put("UUID", player);}});
+            SQLModifier.delete(ban, "ban", new HashMap<String, String>()
+            {{
+                put("UUID", player);
+            }});
         }
         catch (Exception e)
         {

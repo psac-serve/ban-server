@@ -14,15 +14,15 @@ import java.util.logging.Logger;
 
 public class BanServer
 {
+    public static final String dirPath = new File(BanServer.class.getProtectionDomain().getCodeSource().getLocation().toString().replaceFirst("file:([/\\\\])", "")).getParent() +
+            System.getProperty("file.separator") +
+            "PeyangBanServer" +
+            System.getProperty("file.separator");
     public static Logger logger;
     public static FileConfiguration config;
     public static HikariDataSource log;
     public static HikariDataSource bans;
     public static String token;
-    public static final String dirPath = new File(BanServer.class.getProtectionDomain().getCodeSource().getLocation().toString().replaceFirst("file:([/\\\\])", "")).getParent() +
-            System.getProperty("file.separator") +
-            "PeyangBanServer" +
-            System.getProperty("file.separator");
 
     public static void main(String[] args)
     {
@@ -69,7 +69,7 @@ public class BanServer
         logger.info("    IN " + time + "s");
     }
 
-    public static void stop (int code)
+    public static void stop(int code)
     {
         stop(code, true);
     }
@@ -101,8 +101,8 @@ public class BanServer
 
     public static void printStackTrace(Exception e)
     {
-        try(StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw))
+        try (StringWriter sw = new StringWriter();
+             PrintWriter pw = new PrintWriter(sw))
         {
             e.printStackTrace(pw);
             sw.flush();
