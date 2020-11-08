@@ -37,7 +37,7 @@ public class QuickResult
         Arrays.stream(provided.keySet().toArray(new String[0])).parallel()
                 .forEach(re::remove);
 
-        return new Result(QuickResult.error("Missing one or more fields [" +
+        return new Result(QuickResult.error("Missing query(ies): [" +
                 String.join(", ", re) + "]"), 400);
     }
 

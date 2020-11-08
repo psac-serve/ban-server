@@ -13,11 +13,7 @@ import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.github.psacserve.BanServer.bans;
-import static com.github.psacserve.BanServer.config;
-import static com.github.psacserve.BanServer.log;
-import static com.github.psacserve.BanServer.logger;
-import static com.github.psacserve.BanServer.stop;
+import static com.github.psacserve.BanServer.*;
 
 public class Init
 {
@@ -48,22 +44,22 @@ public class Init
         if (!((boolean) config.get("con.antilag.enable")))
         {
             logger.warning("");
-            logger.warning("警告：遅延回避を使用しない場合、接続に著しく時間がかかるようになる可能性があります。");
+            logger.warning("WARNING： If you don't use anti-lag system, connections can take a considerable amount of time.");
             logger.warning("");
             return;
         }
 
-        logger.info("遅延回避タイマーをセットしています...");
+        logger.info("Setting up anti-lag system timer...");
         new Timer().scheduleAtFixedRate(new TimerTask()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    Class.forName("com.github.psacserve.server.Parser");
-                    Class.forName("com.github.psacserve.server.QuickResult");
-                    Class.forName("com.github.psacserve.server.Root");
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                try
+                                                {
+                                                    Class.forName("com.github.psacserve.server.Parser");
+                                                    Class.forName("com.github.psacserve.server.QuickResult");
+                                                    Class.forName("com.github.psacserve.server.Root");
                     Class.forName("com.github.psacserve.Response.BanEntry");
                     Class.forName("com.github.psacserve.Moderate.Ban");
                     Class.forName("com.github.psacserve.Response.Result");
@@ -84,16 +80,16 @@ public class Init
         if (!((boolean) config.get("con.token")))
         {
             logger.warning("");
-            logger.warning("警告：トークンを使用しない場合、第三者にアクセスされデータベースを書き換えられる恐れがあります。");
+            logger.warning("WARNING： If you don't use the token, databases can access and write from third party.");
             logger.warning("");
             return;
         }
 
-        logger.info("トークンを読み込んでいます...");
+        logger.info("Reading the token...");
         if (!Token.exists())
         {
-            logger.info("トークンが見つかりませんでした。");
-            logger.info("トークンを生成します...");
+            logger.info("The token not found.");
+            logger.info("Generating a token...");
             Token.genToken();
         }
 
@@ -103,7 +99,7 @@ public class Init
 
     public static void startServer(int port)
     {
-        logger.info("コアサーバをバインドしています...");
+        logger.info("Binding root server...");
         HttpServer server;
         try
         {
@@ -118,7 +114,7 @@ public class Init
         }
 
         new Thread(() -> {
-            logger.info("コアサーバを" + port + "番でバインドしました。");
+            logger.info("Root server successfully bound at port " + port + ".");
             server.start();
         }).start();
     }
@@ -127,8 +123,8 @@ public class Init
     {
         if (!(boolean)config.get("edit"))
         {
-            logger.severe("設定ファイルが一回も開かれていないないし編集がされていません！");
-            logger.info("NOTE: 開いたことがあるまたは編集したことがある場合、'edit'キーをtrueにセットしてください！");
+            logger.severe("The configuration file doesn't changed!");
+            logger.info("NOTE: If the configuration file was changed, set the key 'edit' to the value 'true'.");
             stop(1);
         }
     }

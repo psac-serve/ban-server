@@ -23,7 +23,7 @@ public class Root implements HttpHandler
 
         if (!s.getRequestHeaders().containsKey("Token"))
         {
-            String message = QuickResult.error("Missing one or more header(s) [Token]");
+            String message = QuickResult.error("Missing header: [Token]");
             s.sendResponseHeaders(403, message.getBytes().length);
             s.getResponseBody().write(message.getBytes());
             return;

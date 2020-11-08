@@ -133,7 +133,7 @@ public class Parser
                 }
                 catch (Exception e)
                 {
-                    return new Result(QuickResult.error("An exception has occurred."), 503);
+                    return new Result(QuickResult.error("Error: " + e.getMessage()), 503);
                 }
 
                 long finalStaff = staff;

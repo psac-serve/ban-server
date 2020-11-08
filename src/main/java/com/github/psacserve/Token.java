@@ -1,10 +1,6 @@
 package com.github.psacserve;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,10 +17,10 @@ public class Token
     {
         if (token.exists())
             return;
+
         try(FileWriter fw = new FileWriter(token))
         {
-
-            String token = UUID.randomUUID().toString().replace("-", "") +
+            final String token = UUID.randomUUID().toString().replace("-", "") +
                     UUID.randomUUID().toString().replace("-", "");
             fw.write(token + ":" + String.valueOf(new Date().getTime()).hashCode());
         }

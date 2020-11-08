@@ -29,8 +29,7 @@ public class BanServer
         logger = Logger.getLogger("PeyangBanManager");
 
         if (Double.parseDouble(System.getProperty("java.specification.version")) != 1.8)
-            logger.warning("PeyangBanServer は、JDK1.8.0(u221) で開発/確認しております。" +
-                    "\nJava8以外のバージョンを使用する場合、意図しない動作または動作しない等のバグが発生する可能性がございます。");
+            logger.warning("PeyangBanServer is developing / running in JDK 1.8.0 update 221. If you running it in different version, it may occur unintended behavior or not starting.");
 
         Logger.getLogger("com.zaxxer.hikari.HikariDataSource").setLevel(Level.OFF);
         System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tH:%1$tM:%1$tS %4$s] %5$s%6$s%n");
@@ -41,8 +40,9 @@ public class BanServer
     private static void start()
     {
         long start = System.currentTimeMillis();
-        logger.info("サーバーを開始しています...");
-        logger.info("設定ファイルを読み込んでいます...");
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        logger.info("--- STARTING SERVER ON " + format.format(new Date()) + " ---");
+        logger.info("Loading configuration file...");
         config = new FileConfiguration("config.yml");
         Init.injectConfig();
         config.saveDefaultConfig();
@@ -50,21 +50,23 @@ public class BanServer
 
         Init.token();
 
-        logger.info("データベースに接続してます...");
+        logger.info("Connecting to database...");
         Init.connectDB();
 
-        logger.info("データベースにテーブルを追加しています...");
+        logger.info("Initializing tables of connected database...");
         Init.initDatabase();
 
         Init.antiLag();
-
-        logger.info("サーバーをスタートします。");
         Init.startServer(config.get("con.port"));
 
-        long end = System.currentTimeMillis() - start;
-        double time = (double) end / 1000;
+        long end = System.currentTimeMillis();
 
-        logger.info(time + "秒で起動が完了しました！");
+        logger.info("--- SERVER STARTED ON " + format.format(new Date()) + " ---");
+
+        long timeDifference = end - start;
+        double time = (double) timeDifference / 1000;
+
+        logger.info("    IN " + time + "s");
     }
 
     public static void stop (int code)
@@ -74,24 +76,24 @@ public class BanServer
 
     public static void stop(int code, boolean real)
     {
-        logger.info("サーバーを停止しています...");
+        logger.info("--- STOPPING SERVER ---");
 
         if (log != null)
         {
-            logger.info("LOGデータベースを停止しています...");
+            logger.info("Stopping logging database...");
             log.close();
             log = null;
         }
 
         if (bans != null)
         {
-            logger.info("BANデータベースを停止しています...");
+            logger.info("Stopping ban database...");
             bans.close();
             bans = null;
         }
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        System.out.println(format.format(new Date()) + " [FATAL] BanSererが終了しました。");
+        System.out.println("--- SERVER STOPPED ON " + format.format(new Date()) + " ---");
 
         if (real)
             System.exit(code);
