@@ -11,10 +11,13 @@ import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class Parser
 {
@@ -99,6 +102,14 @@ public class Parser
                     return new Result(QuickResult.error("This player is not banned."), 404);
 
                 return new Result(QuickResult.successWithObject("ban", entry), 200);
+            case "/lookup":
+                if (!method.equals("GET"))
+                    return new Result(QuickResult.error(method + " is not allowed."), 405);
+                final LinkedList<BanEntry> ents = new LinkedList<>();
+
+                if (req.containsKey("banid"))
+                    ents.addAll(Ban.getBansFromID(req.get("banid")));
+                return new Result(QuickResult.successWithObject("bans", ents), 200);
             case "/weekly":
                 if (!method.equals("GET"))
                     return new Result(QuickResult.error(method + " is not allowed."), 405);

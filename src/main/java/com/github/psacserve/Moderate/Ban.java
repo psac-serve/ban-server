@@ -75,23 +75,13 @@ public class Ban
         BanEntry ban = null;
 
         try (Connection connection = BanServer.bans.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
             if (set.next())
             {
-                final String expire = set.getString("EXPIRE");
-
-                ban = new BanEntry();
-                ban.id = set.getString("BANID");
-                ban.reason = set.getString("REASON");
-                ban.expire = expire.equals("_PERM") ? null: Long.parseLong(expire);
-                ban.bannedDate = set.getLong("DATE");
-                ban.unbannedDate = null;
-                ban.unBanned = false;
-                ban.hasStaff = set.getInt("STAFF") == 1;
-                ban.bannedBy = set.getString("BANNEDBY");
+                ban = getEntryFromResultSet(false, set);
             }
 
         }
@@ -109,27 +99,12 @@ public class Ban
         LinkedList<BanEntry> bans = new LinkedList<>();
 
         try (Connection connection = BanServer.log.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
             while (set.next())
-            {
-                final BanEntry ban = new BanEntry();
-                ban.id = set.getString("BANID");
-                ban.reason = set.getString("REASON");
-                ban.bannedDate = set.getLong("DATE");
-                final String unban = set.getString("UNBANDATE");
-
-                ban.unbannedDate = unban == null || unban.equals("") ? null: Long.parseLong(unban);
-                ban.hasStaff = set.getInt("STAFF") == 1;
-                ban.unBanned = true;
-                ban.expire = set.getString("EXPIRE").equals("_PERM") ? null: set.getLong("EXPIRE");
-                ban.bannedBy = set.getString("BANNEDBY");
-                ban.unBannedBy = set.getString("UNBANNEDBY");
-                ban.unBanReason = set.getString("UNBANREASON");
-                bans.add(ban);
-            }
+                bans.add(getEntryFromResultSet(true, set));
 
         }
         catch (Exception e)
@@ -145,4 +120,57 @@ public class Ban
         return bans;
     }
 
+    public static BanEntry getEntryFromResultSet(final boolean ex, final ResultSet set)
+    {
+        final BanEntry ban = new BanEntry();
+
+        try
+        {
+            ban.id = set.getString("BANID");
+            ban.reason = set.getString("REASON");
+            ban.bannedDate = set.getLong("DATE");
+            ban.unBanned = ex;
+            ban.expire = set.getString("EXPIRE").equals("_PERM") ? null: set.getLong("EXPIRE");
+            ban.bannedBy = set.getString("BANNEDBY");
+            ban.uuid = set.getString("UUID");
+            if (ex)
+            {
+                final String unban = set.getString("UNBANDATE");
+                ban.unbannedDate = unban == null || unban.equals("") ? null: Long.parseLong(unban);
+                ban.hasStaff = set.getInt("STAFF") == 1;
+                ban.unBannedBy = set.getString("UNBANNEDBY");
+                ban.unBanReason = set.getString("UNBANREASON");
+
+            }
+        }
+        catch (Exception ignored) { }
+        return ban;
+    }
+
+    public static LinkedList<BanEntry> getBansFromID(String banid)
+    {
+        final LinkedList<BanEntry> bans = new LinkedList<>();
+        try (final Connection connection = BanServer.log.getConnection();
+             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE BANID=?");
+             final Connection cs = BanServer.bans.getConnection();
+             PreparedStatement bs = cs.prepareStatement("SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE BANID=?"))
+        {
+            statement.setString(1, banid);
+            bs.setString(1, banid);
+            final ResultSet set = statement.executeQuery();
+            if (set.next())
+                bans.add(getEntryFromResultSet(true, set));
+            final ResultSet bss = bs.executeQuery();
+            if (bss.next())
+                bans.add(getEntryFromResultSet(false, bss));
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return bans;
+
+    }
 }

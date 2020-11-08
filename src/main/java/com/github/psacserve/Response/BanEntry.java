@@ -9,8 +9,10 @@ public class BanEntry
     public Long bannedDate;
     public boolean hasStaff;
     public boolean unBanned;
+    public String uuid;
 
     public String bannedBy;
     public String unBannedBy;
     public String unBanReason;
+
 }
