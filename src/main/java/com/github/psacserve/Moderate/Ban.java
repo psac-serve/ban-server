@@ -173,4 +173,46 @@ public class Ban
         return bans;
 
     }
+
+    public static LinkedList<BanEntry> getBansDate(Long before, Long after)
+    {
+        final LinkedList<BanEntry> bans = new LinkedList<>();
+        try (final Connection connection = BanServer.log.getConnection();
+             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE DATE BETWEEN ?" + (before != null ? " AND ?": ""));
+             final Connection cs = BanServer.bans.getConnection();
+             PreparedStatement bs = cs.prepareStatement("SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE DATE BETWEEN ?" + (before != null ? " AND ?": "")))
+        {
+            if (before != null)
+                statement.setLong(2, before);
+            else
+                statement.setLong(2, 0);
+            if (after != null)
+                statement.setLong(1, after);
+            else
+                statement.setLong(1, 0);
+
+            if (before != null)
+                bs.setLong(2, before);
+            else
+                bs.setLong(2, 0);
+            if (after != null)
+                bs.setLong(1, after);
+            else
+                bs.setLong(1, 0);
+            final ResultSet set = statement.executeQuery();
+            while (set.next())
+                bans.add(getEntryFromResultSet(true, set));
+            final ResultSet bss = bs.executeQuery();
+            while (bss.next())
+                bans.add(getEntryFromResultSet(false, bss));
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return bans;
+
+    }
 }

@@ -109,6 +109,12 @@ public class Parser
 
                 if (req.containsKey("banid"))
                     ents.addAll(Ban.getBansFromID(req.get("banid")));
+                if (req.containsKey("before") || req.containsKey("after"))
+                {
+                    final String aft = req.get("before");
+                    final String bef = req.get("after");
+                    ents.addAll(Ban.getBansDate(StringUtils.isNumeric(aft) ? Long.parseLong(aft): null, StringUtils.isNumeric(bef) ? Long.parseLong(bef): null));
+                }
                 return new Result(QuickResult.successWithObject("bans", ents), 200);
             case "/weekly":
                 if (!method.equals("GET"))
