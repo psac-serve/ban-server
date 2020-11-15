@@ -27,13 +27,10 @@ public class Init
         try
         {
             Field cfg = config.getClass().getDeclaredField("cfg");
-            Field file = config.getClass().getDeclaredField("fileStr");
 
             cfg.setAccessible(true);
-            file.setAccessible(true);
 
             cfg.set(config, new File(BanServer.dirPath + "config.yml"));
-            file.set(config, BanServer.dirPath + "config.yml");
 
         }
         catch (Exception e)
