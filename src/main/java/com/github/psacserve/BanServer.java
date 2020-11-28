@@ -6,6 +6,9 @@ import develop.p2p.lib.FileConfiguration;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -45,7 +48,6 @@ public class BanServer
         logger.info("Loading configuration file...");
         config = new FileConfiguration("config.yml");
         Init.injectConfig();
-        config.saveDefaultConfig();
         Init.editCheck();
 
         Init.token();

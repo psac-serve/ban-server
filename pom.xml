@@ -6,7 +6,7 @@
 
     <groupId>com.github.psac-serve</groupId>
     <artifactId>PeyangBanServer</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.4</version>
 
     <build>
         <plugins>

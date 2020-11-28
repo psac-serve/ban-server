@@ -8,8 +8,12 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -31,6 +35,11 @@ public class Init
             cfg.setAccessible(true);
 
             cfg.set(config, new File(BanServer.dirPath + "config.yml"));
+            if (!((File) cfg.get(config)).exists())
+            {
+                Files.createDirectories(new File(BanServer.dirPath).toPath());
+                Files.copy(Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResourceAsStream("config.yml")), new File(BanServer.dirPath + "config.yml").toPath());
+            }
 
         }
         catch (Exception e)
