@@ -37,7 +37,7 @@ public class Init
             cfg.set(config, new File(BanServer.dirPath + "config.yml"));
             if (!((File) cfg.get(config)).exists())
             {
-                Files.createDirectories(new File(BanServer.dirPath).toPath());
+                new File(BanServer.dirPath).mkdirs();
                 Files.copy(Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResourceAsStream("config.yml")), new File(BanServer.dirPath + "config.yml").toPath());
             }
 
