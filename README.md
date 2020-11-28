@@ -33,3 +33,11 @@ editは、設定ファイルを生成し、内容を確認したことを判定�
 リクエストヘッダーに`token: <Token>`を、**全ての**通信に使用してください。
 ## 通信ドキュメント
 いつか書きます。多分。きっと
+## 謝辞
+このサーバは、以下のAPI/ライブラリを使用しております。
++ [brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
++ [P2P-Develop/PeyangSuperLibrary](https://github.com/P2P-Develop/PeyangSuperLibrary)
++ [xerial/sqlite-jdbc](https://github.com/xerial/sqlite-jdbc)
++ [FasterXML/jackson](https://github.com/FasterXML/jackson)
++ [apache/commons-lang](https://github.com/apache/commons-lang)
++ [mysql/mysql-connector-java](https://github.com/mysql/mysql-connector-j)
