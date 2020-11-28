@@ -1,8 +1,8 @@
 # PeyangBanServer
 ## 概要
-Bukkit, Spigot, BungeeCordのプラグインの拡張機能です。  
+Bukkit, Spigot, BungeeCordのプラグインのサーバ機能です。  
 BANの管理ができます。
-このREADME寝ないで書いてるので日本語死んでるかもしれません。    
+プラグイン自体は[ここ](https://github.com/psa-server/ban-manager)から入手可能です。
 ## 通信方式
 HTTP1.1を採用しています。
 ## 使い方
