@@ -160,7 +160,7 @@ public class Init
                     "STAFF integer," +
                     "BANNEDBY text" +
                     ")");
-            logS.execute("CREATE TABLE IF NOT EXISTS ban(" +
+            logS.execute("CREATE TABLE IF NOT EXISTS log(" +
                     "UUID text," +
                     "BANID text," +
                     "DATE text," +

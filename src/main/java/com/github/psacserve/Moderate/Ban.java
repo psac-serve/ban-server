@@ -46,7 +46,7 @@ public class Ban
             ResultSet set = banLp.executeQuery();
             if (!set.next())
                 return;
-            SQLModifier.insert(log, "ban",
+            SQLModifier.insert(log, "log",
                     set.getString("UUID"),
                     set.getString("BANID"),
                     set.getString("DATE"),
@@ -99,7 +99,7 @@ public class Ban
         LinkedList<BanEntry> bans = new LinkedList<>();
 
         try (Connection connection = BanServer.log.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE UUID=?"))
+             PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM log WHERE UUID=?"))
         {
             statement.setString(1, uuid.replace("-", ""));
             ResultSet set = statement.executeQuery();
@@ -151,7 +151,7 @@ public class Ban
     {
         final LinkedList<BanEntry> bans = new LinkedList<>();
         try (final Connection connection = BanServer.log.getConnection();
-             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE BANID=?");
+             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM log WHERE BANID=?");
              final Connection cs = BanServer.bans.getConnection();
              PreparedStatement bs = cs.prepareStatement("SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE BANID=?"))
         {
@@ -178,7 +178,7 @@ public class Ban
     {
         final LinkedList<BanEntry> bans = new LinkedList<>();
         try (final Connection connection = BanServer.log.getConnection();
-             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM ban WHERE DATE BETWEEN ?" + (before != null ? " AND ?": ""));
+             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM log WHERE DATE BETWEEN ?" + (before != null ? " AND ?": ""));
              final Connection cs = BanServer.bans.getConnection();
              PreparedStatement bs = cs.prepareStatement("SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE DATE BETWEEN ?" + (before != null ? " AND ?": "")))
         {

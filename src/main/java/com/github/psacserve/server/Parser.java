@@ -129,7 +129,7 @@ public class Parser
                 try (final Connection connection = BanServer.bans.getConnection();
                      final Connection l = BanServer.log.getConnection();
                      final PreparedStatement sr = connection.prepareStatement("SELECT STAFF FROM ban WHERE DATE BETWEEN ? AND ?");
-                     final PreparedStatement spb = l.prepareStatement("SELECT STAFF FROM main.ban WHERE DATE BETWEEN ? AND ?"))
+                     final PreparedStatement spb = l.prepareStatement("SELECT STAFF FROM log WHERE DATE BETWEEN ? AND ?"))
                 {
                     sr.setLong(1, btw);
                     sr.setLong(2, new Date().getTime());
