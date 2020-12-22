@@ -8,9 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 
 public class Ban
 {
@@ -21,7 +19,7 @@ public class Ban
                      connection.prepareStatement("INSERT INTO ban VALUES (?, ?, ?, ?, ?, ?, ?)"))
         {
             statement.setString(1, uuid.replace("-", ""));
-            statement.setString(2, RandomStringUtils.randomAlphanumeric(8));
+            statement.setString(2, UUID.randomUUID().toString());
             statement.setString(3, String.valueOf(new Date().getTime()));
             statement.setString(4, reason);
             statement.setString(5, date == null ? "_PERM": String.valueOf(date.getTime()));
