@@ -1,15 +1,19 @@
 package com.github.psacserve.server;
 
+import com.fasterxml.jackson.databind.*;
 import com.github.psacserve.BanServer;
 import com.github.psacserve.Response.Result;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.msgpack.core.*;
+import org.msgpack.jackson.dataformat.*;
+import org.msgpack.value.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.awt.image.*;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import java.util.*;
 
 public class Root implements HttpHandler
 {
@@ -20,22 +24,6 @@ public class Root implements HttpHandler
         StringBuilder body = new StringBuilder();
 
         s.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-
-        if (!s.getRequestHeaders().containsKey("Token"))
-        {
-            String message = QuickResult.error("Missing header: [Token]");
-            s.sendResponseHeaders(403, message.getBytes().length);
-            s.getResponseBody().write(message.getBytes());
-            return;
-        }
-
-        if (s.getRequestHeaders().get("Token").size() != 1 ||
-                !s.getRequestHeaders().get("Token").get(0).equals(BanServer.token))
-        {
-            String message = QuickResult.error("Invalid Token");
-            s.sendResponseHeaders(403, message.getBytes().length);
-            s.getResponseBody().write(message.getBytes());
-        }
 
         try
         {
@@ -48,7 +36,6 @@ public class Root implements HttpHandler
             BanServer.printStackTrace(e);
         }
 
-
         String req = body.toString();
 
         String[] uri = new String[0];
@@ -59,17 +46,69 @@ public class Root implements HttpHandler
             req = uri[1];
         }
 
+        HashMap<String, String> querys = parseRequest(req);
+
+        if (!s.getRequestHeaders().containsKey("Token"))
+        {
+            ObjectMapper mapper = querys.containsKey("raw") && querys.get("raw").equals("true") ?
+                    new ObjectMapper(new MessagePackFactory()): new ObjectMapper();
+            byte[] bytes = mapper.writeValueAsBytes(QuickResult.error("Missing header: [Token]"));
+            s.sendResponseHeaders(403, bytes.length);
+            s.getResponseBody().write(bytes);
+            return;
+        }
+
+        if (s.getRequestHeaders().get("Token").size() != 1 ||
+                !s.getRequestHeaders().get("Token").get(0).equals(BanServer.token))
+        {
+            ObjectMapper mapper = querys.containsKey("raw") && querys.get("raw").equals("true") ?
+                    new ObjectMapper(new MessagePackFactory()): new ObjectMapper();
+            byte[] bytes = mapper.writeValueAsBytes(QuickResult.error("Invalid Token"));
+            s.sendResponseHeaders(403, bytes.length);
+            s.getResponseBody().write(bytes);
+            return;
+        }
+
         final String method = s.getRequestMethod();
         final String path = s.getRequestMethod().equals("GET") && s.getRequestURI().toString().contains("?") ? uri[0]: s.getRequestURI().toString();
         BanServer.logger.info(method + ":   FROM: " + s.getRemoteAddress().getAddress().toString() + "    " + path + "  " + req);
 
-
-        Result result = Parser.parse(method, path, req);
+        Result result = Parser.parse(method, path, querys);
 
         OutputStream rB = s.getResponseBody();
-        s.sendResponseHeaders(result.code, result.body.equals("") ? 0: result.body.getBytes(StandardCharsets.UTF_8).length);
-        if (result.body.length() != 0)
-            rB.write(result.body.getBytes(StandardCharsets.UTF_8));
+
+        if (querys.containsKey("raw") && querys.get("raw").equals("true"))
+        {
+            String json = new ObjectMapper().writeValueAsString(result.body);
+            s.sendResponseHeaders(result.code, json.getBytes(StandardCharsets.UTF_8).length);
+            rB.write(json.getBytes(StandardCharsets.UTF_8));
+            rB.close();
+            return;
+        }
+
+        final byte[] b = new ObjectMapper(new MessagePackFactory()).writeValueAsBytes(result.body);
+        s.sendResponseHeaders(result.code, b.length);
+        rB.write(b);
         rB.close();
+    }
+
+
+    private static HashMap<String, String> parseRequest(String request)
+    {
+        HashMap<String, String> resp = new HashMap<>();
+        if (request.equals(""))
+            return resp;
+        Arrays.stream(StringUtils.split(request, "&"))
+                .parallel()
+                .forEach(s -> {
+                    String[] key = StringUtils.split(s, "=");
+                    if (key.length != 2)
+                    {
+                        resp.put(key[0], "");
+                        return;
+                    }
+                    resp.put(key[0], key[1]);
+                });
+        return resp;
     }
 }

@@ -172,31 +172,68 @@ public class Ban
 
     }
 
+    private static int typeTo(Long before, Long after)
+    {
+        if (before == null && after == null)
+            return -1; //beforeとafterがnull (例外
+        else if (before == null)
+            return 0; //beforeはnullだけどafterは有効
+        else if (after != null)
+            return 1; //beforeとafterは有効
+        else
+            return 2; //beforeは有効だけどafterはnull
+    }
+
     public static LinkedList<BanEntry> getBansDate(Long before, Long after)
     {
-        final LinkedList<BanEntry> bans = new LinkedList<>();
-        try (final Connection connection = BanServer.log.getConnection();
-             final PreparedStatement statement = connection.prepareStatement("SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM log WHERE DATE BETWEEN ?" + (before != null ? " AND ?": ""));
-             final Connection cs = BanServer.bans.getConnection();
-             PreparedStatement bs = cs.prepareStatement("SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE DATE BETWEEN ?" + (before != null ? " AND ?": "")))
+        final int a = typeTo(before, after);
+        String logQ = "SELECT UUID, UNBANREASON, BANNEDBY, UNBANNEDBY, BANID, REASON, STAFF, UNBANDATE, DATE, EXPIRE FROM log WHERE DATE ";
+        String banQ = "SELECT UUID, BANNEDBY, BANID, REASON, EXPIRE, STAFF, DATE FROM ban WHERE DATE ";
+        switch (a)
         {
-            if (before != null)
-                statement.setLong(2, before);
-            else
-                statement.setLong(2, 0);
-            if (after != null)
-                statement.setLong(1, after);
-            else
-                statement.setLong(1, 0);
+            default:
+            case -1:
+                return new LinkedList<>();
+            case 0:
+                logQ += "<= ?";
+                banQ += "<= ?";
+                break;
+            case 1:
+                logQ += "? >= DATE AND >= ?";
+                banQ += "? >= DATE AND >= ?";
+                break;
+            case 2:
+                logQ += ">= ?";
+                banQ += ">= ?";
+                break;
+        }
 
-            if (before != null)
-                bs.setLong(2, before);
-            else
-                bs.setLong(2, 0);
-            if (after != null)
-                bs.setLong(1, after);
-            else
-                bs.setLong(1, 0);
+        final LinkedList<BanEntry> bans = new LinkedList<>();
+
+        try (final Connection connection = BanServer.log.getConnection();
+             final PreparedStatement statement = connection.prepareStatement(logQ);
+             final Connection cs = BanServer.bans.getConnection();
+             PreparedStatement bs = cs.prepareStatement(banQ))
+        {
+            switch (a)
+            {
+                case 0:
+                    statement.setLong(1, after);
+                    bs.setLong(1, after);
+                    break;
+                case 1:
+                    statement.setLong(1, before);
+                    bs.setLong(1, before);
+                    statement.setLong(2, after);
+                    bs.setLong(2, after);
+                    break;
+                case 2:
+                    statement.setLong(1, before);
+                    bs.setLong(1, before);
+                    break;
+                default:
+                    return new LinkedList<>();
+            }
             final ResultSet set = statement.executeQuery();
             while (set.next())
                 bans.add(getEntryFromResultSet(true, set));

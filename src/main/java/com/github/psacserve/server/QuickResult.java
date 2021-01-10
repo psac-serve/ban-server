@@ -11,17 +11,13 @@ import java.util.LinkedList;
 
 public class QuickResult
 {
-    public static String error(String cause)
+    public static HashMap<String, Object> error(String cause)
     {
-        try
-        {
-            return "{\"success\":false,\"cause\":\"" + cause.replace("\"", "\\\"") + "\"}";
-        }
-        catch (Exception e)
-        {
-            BanServer.printStackTrace(e);
-            return "";
-        }
+        return new HashMap<String, Object>()
+        {{
+            put("success", false);
+            put("cause", cause);
+        }};
     }
 
     public static boolean isMissingFields(HashMap<String, String> provided, String... require)
@@ -41,20 +37,12 @@ public class QuickResult
                 String.join(", ", re) + "]"), 400);
     }
 
-    public static <T> String successWithObject(String entName, T obj)
+    public static <T> HashMap<String, Object> successWithObject(String entName, T obj)
     {
-        try
-        {
-            return new ObjectMapper().writeValueAsString(new HashMap<String, Object>()
-            {{
-                put("success", true);
-                put(entName, obj);
-            }});
-        }
-        catch (JsonProcessingException e)
-        {
-            BanServer.printStackTrace(e);
-            return error("JSON_PARSE_ERROR");
-        }
+        return new HashMap<String, Object>()
+        {{
+            put("success", true);
+            put(entName, obj);
+        }};
     }
 }

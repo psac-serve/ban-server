@@ -1,11 +1,13 @@
 package com.github.psacserve.Response;
 
+import java.util.*;
+
 public class Result
 {
-    public String body;
+    public HashMap<String, Object> body;
     public int code;
 
-    public Result(String body, int code)
+    public Result(HashMap<String, Object> body, int code)
     {
         this.body = body;
         this.code = code;

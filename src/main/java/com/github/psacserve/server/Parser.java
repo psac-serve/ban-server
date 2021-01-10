@@ -21,13 +21,8 @@ import java.util.LinkedList;
 
 public class Parser
 {
-    public static Result parse(final String method, final String path, final String request)
+    public static Result parse(final String method, final String path, final HashMap<String, String> req)
     {
-
-
-        HashMap<String, String> req = parseRequest(request);
-
-
         switch (path)
         {
             case "/ban":
@@ -42,11 +37,11 @@ public class Parser
                 }
                 catch (UnsupportedEncodingException e)
                 {
-                    return new Result("Failed to reason parsing.", 405);
+                    return new Result(QuickResult.error("Failed to reason parsing."), 405);
                 }
 
                 if (!req.get("expire").matches("^[0-9]+$") && !req.get("expire").equals("_PERM"))
-                    return new Result(req.get("expire") + " is not a DateTime.", 405);
+                    return new Result(QuickResult.error(req.get("expire") + " is not a DateTime."), 405);
 
                 new Thread(() -> {
                     Ban.ban(
@@ -73,7 +68,7 @@ public class Parser
                 }
                 catch (UnsupportedEncodingException e)
                 {
-                    return new Result("Failed to reason parsing.", 405);
+                    return new Result(QuickResult.error("Failed to reason parsing."), 405);
                 }
 
                 new Thread(() -> {
@@ -111,9 +106,9 @@ public class Parser
                     ents.addAll(Ban.getBansFromID(req.get("banid")));
                 if (req.containsKey("before") || req.containsKey("after"))
                 {
-                    final String aft = req.get("before");
-                    final String bef = req.get("after");
-                    ents.addAll(Ban.getBansDate(StringUtils.isNumeric(aft) ? Long.parseLong(aft): null, StringUtils.isNumeric(bef) ? Long.parseLong(bef): null));
+                    final String bef = req.get("before");
+                    final String aft = req.get("after");
+                    ents.addAll(Ban.getBansDate(StringUtils.isNumeric(bef) ? Long.parseLong(bef): null, StringUtils.isNumeric(aft) ? Long.parseLong(aft): null));
                 }
                 return new Result(QuickResult.successWithObject("bans", ents), 200);
             case "/weekly":
@@ -167,24 +162,5 @@ public class Parser
             default:
                 return new Result(QuickResult.error("Method not found."), 403);
         }
-    }
-
-    public static HashMap<String, String> parseRequest(String request)
-    {
-        HashMap<String, String> resp = new HashMap<>();
-        if (request.equals(""))
-            return resp;
-        Arrays.stream(StringUtils.split(request, "&"))
-                .parallel()
-                .forEach(s -> {
-                    String[] key = StringUtils.split(s, "=");
-                    if (key.length != 2)
-                    {
-                        resp.put(key[0], "");
-                        return;
-                    }
-                    resp.put(key[0], key[1]);
-                });
-        return resp;
     }
 }
