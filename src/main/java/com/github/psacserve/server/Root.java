@@ -51,7 +51,7 @@ public class Root implements HttpHandler
         if (!s.getRequestHeaders().containsKey("Token"))
         {
             ObjectMapper mapper = querys.containsKey("raw") && querys.get("raw").equals("true") ?
-                    new ObjectMapper(new MessagePackFactory()): new ObjectMapper();
+                    new ObjectMapper(): new ObjectMapper(new MessagePackFactory());
             byte[] bytes = mapper.writeValueAsBytes(QuickResult.error("Missing header: [Token]"));
             s.sendResponseHeaders(403, bytes.length);
             s.getResponseBody().write(bytes);
@@ -62,7 +62,7 @@ public class Root implements HttpHandler
                 !s.getRequestHeaders().get("Token").get(0).equals(BanServer.token))
         {
             ObjectMapper mapper = querys.containsKey("raw") && querys.get("raw").equals("true") ?
-                    new ObjectMapper(new MessagePackFactory()): new ObjectMapper();
+                    new ObjectMapper(): new ObjectMapper(new MessagePackFactory());
             byte[] bytes = mapper.writeValueAsBytes(QuickResult.error("Invalid Token"));
             s.sendResponseHeaders(403, bytes.length);
             s.getResponseBody().write(bytes);
