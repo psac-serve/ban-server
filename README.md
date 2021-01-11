@@ -32,7 +32,7 @@ editは、設定ファイルを生成し、内容を確認したことを判定�
 トークンは`token.sig`ファイルに保存されており、データフォルダに作成されます。  
 リクエストヘッダーに`token: <Token>`を、**全ての**通信に使用してください。
 ## 通信ドキュメント
-いつか書きます。多分。きっと
+[Swaggerにより自動生成されたドキュメント](https://psac-serve.github.io/ban-server/)を公開いたしました。
 ## 謝辞
 このサーバは、以下のAPI/ライブラリを使用しております。
 + [brettwooldridge/HikariCP](https://github.com/brettwooldridge/HikariCP)
