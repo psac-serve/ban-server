@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class Token
 {
-    private static final File token = new File(BanServer.dirPath + "token.sig");
+    private static final File token = new File(BanServer.dataFolder, "token.sig");
 
     public static boolean exists()
     {

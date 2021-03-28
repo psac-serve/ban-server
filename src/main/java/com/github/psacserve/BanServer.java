@@ -6,6 +6,7 @@ import develop.p2p.lib.FileConfiguration;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,15 +18,13 @@ import java.util.logging.Logger;
 
 public class BanServer
 {
-    public static final String dirPath = new File(BanServer.class.getProtectionDomain().getCodeSource().getLocation().toString().replaceFirst("file:([/\\\\])", "")).getParent() +
-            System.getProperty("file.separator") +
-            "PeyangBanServer" +
-            System.getProperty("file.separator");
     public static Logger logger;
     public static FileConfiguration config;
     public static HikariDataSource log;
     public static HikariDataSource bans;
     public static String token;
+
+    public static File dataFolder;
 
     public static void main(String[] args)
     {
@@ -46,8 +45,22 @@ public class BanServer
         final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         logger.info("--- STARTING SERVER ON " + format.format(new Date()) + " ---");
         logger.info("Loading configuration file...");
-        config = new FileConfiguration("config.yml");
-        Init.injectConfig();
+
+        try
+        {
+            dataFolder = new File(new File(BanServer.class
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation().toURI()).getAbsoluteFile().getParentFile(), "PeyangBanServer");
+            dataFolder.mkdirs();
+        }
+        catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+            return;
+        }
+        config = new FileConfiguration(dataFolder,"config.yml");
+        config.saveDefaultConfig();
         Init.editCheck();
 
         Init.token();
