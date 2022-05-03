@@ -3,7 +3,7 @@
 ## 概要
 
 Bukkit, Spigot, BungeeCordのプラグインのサーバ機能です。  
-BANの管理ができます。 プラグイン自体は[ここ](https://github.com/psa-server/ban-manager)から入手可能です。
+BANの管理ができます。 プラグイン自体は[ここ](https://github.com/psac-serve/ban-manager)から入手可能です。
 
 ## 通信方式
 
